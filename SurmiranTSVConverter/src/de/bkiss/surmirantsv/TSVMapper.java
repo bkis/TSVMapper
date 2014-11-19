@@ -32,7 +32,7 @@ public class TSVMapper {
 		System.out.print("[INFO] adding unused target field names... ");
 		//add unused target field names
 		List<String> fields = new ArrayList<String>();
-		for (String s :srcData.get(0))
+		for (String s : srcData.get(0))
 			fields.add(s);
 		for (String s : targetFields)
 			if (!fields.contains(s))
@@ -40,6 +40,20 @@ public class TSVMapper {
 		srcData.remove(0);
 		String[] newFields = new String[fields.size()];
 		srcData.add(0, fields.toArray(newFields));
+		
+		//fill empty fields with empty values
+		String[] curr;
+		for (int i = 1; i < srcData.size(); i++) {
+			curr = new String[srcData.get(0).length];
+			for (int j = 0; j < srcData.get(i).length; j++){
+				curr[j] = srcData.get(i)[j];
+			}
+			for (int j = 0; j < curr.length; j++) {
+				if (curr[j] == null) curr[j] = "";
+			}
+			srcData.remove(i);
+			srcData.add(i, curr);
+		}
 		
 		System.out.println("OK");
 		return srcData;
@@ -54,7 +68,7 @@ public class TSVMapper {
 			for (String s : sArr){
 				sb.append(s + delimiter);
 			}
-			sb.append("\n");
+			sb.replace(sb.length()-delimiter.length(), sb.length(), "\n");
 		}
 		
 		try {
