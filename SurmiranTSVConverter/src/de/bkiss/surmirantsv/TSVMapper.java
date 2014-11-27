@@ -60,17 +60,34 @@ public class TSVMapper {
 	}
 	
 	
-	public void writeSV(List<String[]> svData, String delimiter, String path){
+	public void writeSV(List<String[]> svData,
+						String delimiter,
+						String path,
+						String excludePattern,
+						String excludeEntriesWithEmptyDataFor){
+		
 		System.out.print("[INFO] writing data to " + path + " ... ");
 		StringBuilder sb = new StringBuilder();
 		
+		int excludeEmpty = findIndexOf(svData.get(0), excludeEntriesWithEmptyDataFor);
+		//check find
+		if (excludeEmpty == -1){
+			System.out.println("[ERROR] target column \"" + excludeEntriesWithEmptyDataFor + "\" not found. cancelling...");
+			return;
+		}
+		
+		//generate text data
 		for (String[] sArr : svData){
+			//exclude entries with empty data for excludeEntriesWithEmptyDataFor
+			if (sArr[excludeEmpty].equals("")) continue;
+			
 			for (String s : sArr){
-				sb.append(s + delimiter);
+				sb.append(s.replaceAll(excludePattern, "") + delimiter);
 			}
 			sb.replace(sb.length()-delimiter.length(), sb.length(), "\n");
 		}
 		
+		//frite to file
 		try {
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path), "UTF-8"));
@@ -99,6 +116,38 @@ public class TSVMapper {
 		
 		System.out.println("OK");
 		return tsv;
+	}
+	
+	public void printEmptyData(String tsvPath, String delimiter, String targetColumn){
+		List<String[]> data = readSV(tsvPath, delimiter);
+		String[] columnNames = data.remove(0);
+		int targetIndex = findIndexOf(columnNames, targetColumn);
+		int count = 0;
+		
+		//check find
+		if (targetIndex == -1){
+			System.out.println("[ERROR] target column \"" + targetColumn + "\" not found. cancelling...");
+			return;
+		}
+		
+		//search for empty data
+		for (String[] sArr : data){
+			if (sArr[targetIndex].equals("")){
+				count++;
+				System.out.print("EMPTY DATA FOR \"" + targetColumn + "\" IN LINE: ");
+				for (String s : sArr) System.out.print(s + delimiter);
+				System.out.println("");
+			}
+		}
+		System.out.println("TOTAL EMPTY ENTRIES FOR \"" + targetColumn + "\": " + count);
+	}
+	
+	private int findIndexOf(String[] array, String value){
+		//find target index
+		for (int i = 0; i < array.length; i++)
+			if (array[i].equals(value))
+				return i;
+		return -1;
 	}
 	
 }

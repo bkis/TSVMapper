@@ -18,7 +18,9 @@ public class Main {
 		
 		List<String[]> tsv = tsvm.createTSV("input.tab", "surmiran.tab", fieldMap);
 		
-		tsvm.writeSV(tsv, "\t", "output.tab");
+		tsvm.writeSV(tsv, "\t", "output.tab", "[\\(\\)\\{\\}\\[\\]]", "RStichwort");
+		
+//		tsvm.printEmptyData("surmiran.tab", "\t", "RStichwort");
 		
 	}
 
