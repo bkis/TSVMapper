@@ -87,7 +87,7 @@ public class TSVMapper {
 			sb.replace(sb.length()-delimiter.length(), sb.length(), "\n");
 		}
 		
-		//frite to file
+		//write to file
 		try {
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path), "UTF-8"));
